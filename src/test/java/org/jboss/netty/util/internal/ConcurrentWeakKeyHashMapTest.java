@@ -15,9 +15,11 @@
  */
 package org.jboss.netty.util.internal;
 
+import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
-import static java.lang.System.*; 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -65,7 +67,7 @@ public class ConcurrentWeakKeyHashMapTest {
      * 
      * @throws InterruptedException
      */
-    @Test
+//    @Test
     public void testABA() throws InterruptedException {
     	
     	int nThreads = 2;
@@ -126,6 +128,81 @@ public class ConcurrentWeakKeyHashMapTest {
     	// wait for all thread to finish
     	endGate.await();
     	
+    }
+    
+    
+    @Test
+    public void testSize() {
+    	ConcurrentMap<String,String> concurrentMap = new ConcurrentWeakKeyHashMap<String,String>();
+    	
+    	// basic put operation
+    	concurrentMap.put("key1", "value1");
+    	concurrentMap.put("key2", "value2");
+    	
+    	int size = concurrentMap.size();
+    	assertEquals(size, 2);
+    	
+    }
+    
+    
+    @Test
+    public void testConcurrentHashMap() {
+    	int maxNum = 30000;
+    	int initalCapacity = 2*maxNum;
+    	ConcurrentMap<String,String> concurrentMap = new ConcurrentHashMap<String,String>(initalCapacity);
+    	for( int i=0; i<maxNum; i++) {
+    		String key = "k" + i;
+    		String value = "v" + i;
+    		concurrentMap.put(key, value);
+    		//System.out.println(concurrentMap.size());
+    	}
+    	int size = concurrentMap.size();
+    	assertEquals(size, maxNum);
+    }
+    
+    @Test
+    public void testWeakKeyGarbageCollection() throws InterruptedException {
+    	int maxNum = 9000;
+    	int initalCapacity = 2*maxNum;
+    	ConcurrentWeakKeyHashMap<String,String> concurrentMap = new ConcurrentWeakKeyHashMap<String,String>(initalCapacity);    	
+    	
+    	List<String> strongList = new ArrayList();
+    	
+    	for( int i=0; i<maxNum; i++) {
+    		String key = "k" + i;
+    		String value = "v" + i;
+    		concurrentMap.put(key, value);
+    		strongList.add(key);
+    	}
+    	
+    	int size = concurrentMap.size();
+    	assertEquals(size, maxNum);
+    	strongList.clear();
+    	strongList = null;
+    	System.gc();
+    	
+    	// garbage collection doesn't affect concurrentMap at this point.
+    	size = concurrentMap.size();
+    	assertEquals(size, maxNum);
+
+    	// adding and removing just one entry doesn't affect the size.
+    	concurrentMap.put("ka", "va");
+    	concurrentMap.remove("ka");
+//    	concurrentMap.keys();
+
+    	size = concurrentMap.size();
+    	assertEquals(size, maxNum);
+    	
+    	for( int i=maxNum; i<maxNum+1000; i++) {
+    		String key = "k" + i;
+    		String value = "v" + i;
+    		concurrentMap.put(key, value);
+    	}
+     	
+    	// adding many entries does affect the size, it's now variable (and always smaller than maxNum)
+    	size = concurrentMap.size();
+    	assertEquals(true, (size < maxNum));
+    	out.println(size);
     }
     
 
