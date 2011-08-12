@@ -15,36 +15,28 @@
  */
 package org.jboss.netty.util;
 
-import static org.junit.Assert.assertNull;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
-
-public class VirtualExecutorServiceTest {
+public class ExternalResourceUtilTest {
 
 	@Test
-	public void testVirtualExecutorService() throws InterruptedException, ExecutionException {
-		Executor executor = Executors.newFixedThreadPool(2);
-
-		VirtualExecutorService virtualExecutor = new VirtualExecutorService(executor);
-		Future future = virtualExecutor.submit(new Runnable() {
-
-			@Override
-			public void run() {
-				System.out.println("running inside VirtualExecutor");				
-			}			
-		});
+	public void testRelease() throws InterruptedException, ExecutionException {
+		ExternalResourceReleasable externalResource = new ExternalResourceImpl();
+		ExternalResourceReleasable externalResource2 = new ExternalResourceImpl();
+		ExternalResourceUtil.release(externalResource, externalResource2);		
+	}
+	
+	class ExternalResourceImpl implements ExternalResourceReleasable {
+		@Override
+		public void releaseExternalResources() {
+			System.out.println("releasing resources...");
+		}
 		
-		Object futureReturn = future.get();
-		
-		// completed future returns null
-		assertNull(futureReturn);
-		
-		virtualExecutor.shutdown();
 	}
 }
