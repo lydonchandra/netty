@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.jboss.netty.buffer;
+package org.jboss.netty.channel.local;
 
 import static org.jboss.netty.buffer.ChannelBuffers.*;
 import static org.junit.Assert.*;
@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ScatteringByteChannel;
 import java.util.Arrays;
@@ -31,28 +32,22 @@ import java.util.Random;
 import java.util.Set;
 
 import org.easymock.classextension.EasyMock;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.util.CharsetUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- * @author <a href="http://www.jboss.org/netty/">The Netty Project</a>
- * @author <a href="http://gleamynode.net/">Trustin Lee</a>
- *
- * @version $Rev$, $Date$
- */
-public class HeapChannelBufferTest {
+public class LocalClientChannelSinkTest {
 
 	@Test
 	public void testHeapChannelBuffer() throws IOException {
 		
-		HeapChannelBuffer buffer = (HeapChannelBuffer) HeapChannelBufferFactory.getInstance(LITTLE_ENDIAN).getBuffer(1024*1024);
-		assertEquals(buffer.capacity(), (1024*1024));
-				
-		int readCount = buffer.setBytes(0, EasyMock.createMock(ScatteringByteChannel.class), 10);
-		assertEquals(readCount, 0);
+		
+		DefaultLocalServerChannelFactory factory = new DefaultLocalServerChannelFactory();
+		LocalServerChannel channel = factory.newChannel(Channels.pipeline());
+		channel.close();
+		assertEquals(channel.getFactory(), factory);
 		
 		
 	}
