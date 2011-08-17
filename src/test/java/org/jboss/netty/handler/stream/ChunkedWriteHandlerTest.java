@@ -117,31 +117,39 @@ public class ChunkedWriteHandlerTest {
     	});
 
     	InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", testPort);
-    	ChannelFuture channelFuture =  clientBootstrap.connect(inetSocketAddress);
+    	final ChannelFuture channelFuture =  clientBootstrap.connect(inetSocketAddress);
     	
-//    	channelFuture.addListener(
-//    			new ChannelFutureListener() {
-//					@Override
-//					public void operationComplete(ChannelFuture future) throws Exception {
-//						System.out.println("connected!");
-//					}
-//			}
-//    	);
+		//    	channelFuture.addListener(
+		//    			new ChannelFutureListener() {
+		//					@Override
+		//					public void operationComplete(ChannelFuture future) throws Exception {
+		//						System.out.println("connected!");
+		//						
+		//						Channel clientChannel = channelFuture.getChannel();
+		//				    	ChannelFuture channelFuture2 = clientChannel.write( new ChunkedFile( new File("k:\\soft\\openjdk-7-fcs-src-b147-27_jun_2011.zip"))  );
+		//				    	
+		//				    	channelFuture2.addListener(
+		//				    			new ChannelFutureListener() {
+		//									@Override
+		//									public void operationComplete(ChannelFuture future) throws Exception {
+		//										System.out.println("finished uploading!");
+		//									}
+		//								}
+		//				    	);
+		////				    	Thread.sleep(20000);
+		////				    	clientChannel.getCloseFuture().await(100000);
+		//				    	
+		//					}
+		//			}
+		//    	);
 
     	// why do I need this sleep ??? for some reason, I can't just use channelFutureListener.operationComplete.
     	// something else is killing the channel if i wrap things up inside channelFutureListener.operationComplete
-    	Thread.sleep(1000);
-//    	channelFuture.addListener(
-//    			new ChannelFutureListener() {
-//					@Override
-//					public void operationComplete(ChannelFuture future) throws Exception {
-//						System.out.println("operationComplete!");
-//					}
-//				}
-//    	);
+    	Thread.sleep(2000);
     	
     	Channel clientChannel = channelFuture.getChannel();
-    	ChannelFuture channelFuture2 = clientChannel.write( new ChunkedFile( new File("i:\\test\\mipro-v11-eval.zip"))  );
+    	ChannelFuture channelFuture2 = clientChannel.write( new ChunkedFile( 
+    			new File(this.getClass().getResource("/data.zip").getFile()) )  );
     	
     	channelFuture2.addListener(
     			new ChannelFutureListener() {
@@ -151,8 +159,7 @@ public class ChunkedWriteHandlerTest {
 					}
 				}
     	);
-    	
-    	clientChannel.getCloseFuture().await(100000);
+    	clientChannel.getCloseFuture().await(10000);
     	
     	
     	

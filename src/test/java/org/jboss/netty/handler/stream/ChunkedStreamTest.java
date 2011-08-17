@@ -15,8 +15,10 @@
  */
 package org.jboss.netty.handler.stream;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedInputStream; 
+import java.io.File;
 import java.io.FileInputStream;
+import java.nio.channels.Channels;
 
 import junit.framework.Assert;
 
@@ -34,17 +36,18 @@ public class ChunkedStreamTest {
 	
 	@Test
 	public void testBasic() throws Exception {
-		FileInputStream fileStream = new FileInputStream("k:\\soft\\java.zip");
+		
+		FileInputStream fileStream = new FileInputStream(
+				new File(this.getClass().getResource("/data.zip").getFile())
+				);
 		BufferedInputStream bufferStream = new BufferedInputStream(fileStream);
-		ChunkedStream chunkStream = new ChunkedStream(bufferStream);
-
-		Assert.assertEquals(chunkStream.getTransferredBytes(), 0);
 		
-		while( !chunkStream.isEndOfInput() ) {
-			Object chunk = chunkStream.nextChunk();
-			Assert.assertNotNull(chunk);
+		ChunkedNioStream nioStream = new ChunkedNioStream( Channels.newChannel(bufferStream) );
+		Assert.assertEquals(nioStream.getTransferredBytes(),0);
+		while( !nioStream.isEndOfInput()) {
+			Object obj = nioStream.nextChunk();
 		}
+		Assert.assertTrue( nioStream.getTransferredBytes() > 0);
 		
-		chunkStream.close();
 	}
 }

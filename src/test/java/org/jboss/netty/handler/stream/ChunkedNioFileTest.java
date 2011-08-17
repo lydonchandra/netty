@@ -36,9 +36,7 @@ public class ChunkedNioFileTest {
 	
 	@Test
 	public void testBasic() throws Exception {
-		FileInputStream fileStream = new FileInputStream("k:\\soft\\java.zip");
-		
-		File file = new File("k:\\soft\\java.zip");
+		File file = new File(this.getClass().getResource("/data.zip").getFile());
 		ChunkedNioFile chunkedFile = new ChunkedNioFile(file);
 		Assert.assertTrue(chunkedFile.getCurrentOffset() == 0);
 		Assert.assertTrue(chunkedFile.getEndOffset() > 0);

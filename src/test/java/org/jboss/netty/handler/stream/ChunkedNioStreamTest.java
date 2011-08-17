@@ -16,6 +16,7 @@
 package org.jboss.netty.handler.stream;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 
 import junit.framework.Assert;
@@ -34,7 +35,8 @@ public class ChunkedNioStreamTest {
 	
 	@Test
 	public void testBasic() throws Exception {
-		FileInputStream fileStream = new FileInputStream("k:\\soft\\java.zip");
+		FileInputStream fileStream = new FileInputStream(
+				new File(this.getClass().getResource("/data.zip").getFile()));
 		BufferedInputStream bufferStream = new BufferedInputStream(fileStream);
 		ChunkedStream chunkStream = new ChunkedStream(bufferStream);
 
